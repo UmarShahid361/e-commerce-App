@@ -1,4 +1,4 @@
-import 'package:e_commerce_app/auth/logIn.dart';
+
 import 'package:e_commerce_app/pages/MainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -96,12 +96,6 @@ class _SignInState extends State<SignIn> {
                 const Text("Already have an account?"),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LogIn(),
-                      ),
-                    );
                   },
                   child: const Text("Login"),
                 ),

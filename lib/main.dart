@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
           background: const Color(0xffCCCCCC),
         ),
       ),
-      home: Profile(),
+      home: SplashScreen(),
     );
   }
 }
