@@ -25,7 +25,6 @@ class _SplashScreenState extends State<SplashScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Lottie.asset('assets/64325-young-girl-style-walk-loop.json'),
-
         ],
       ),
     );

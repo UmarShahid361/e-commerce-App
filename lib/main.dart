@@ -1,6 +1,9 @@
 import 'package:e_commerce_app/auth/signIn.dart';
 import 'package:e_commerce_app/pages/SplashScreen.dart';
+import 'package:e_commerce_app/pages/morePages/AddSenderDetails.dart';
 import 'package:e_commerce_app/pages/morePages/bandDetails.dart';
+import 'package:e_commerce_app/pages/morePages/senderDetails.dart';
+import 'package:e_commerce_app/pages/profileScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -26,7 +29,7 @@ class MyApp extends StatelessWidget {
           background: const Color(0xffCCCCCC),
         ),
       ),
-      home: BankDetails(),
+      home: Profile(),
     );
   }
 }

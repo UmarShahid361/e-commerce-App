@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class BankCard extends StatelessWidget {
-  const BankCard(
+class SenderCard extends StatelessWidget {
+  const SenderCard(
       {super.key,
-      required this.bankName,
-      required this.accountNumber});
+        required this.senderName,
+        required this.senderNumber});
 
-  final String bankName;
-  final String accountNumber;
+  final String senderName;
+  final String senderNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class BankCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Account Number: $accountNumber",
+              "Sender Name: $senderName",
               textAlign: TextAlign.start,
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
@@ -39,7 +39,7 @@ class BankCard extends StatelessWidget {
               ),
             ),
             Text(
-              "Bank Name: $bankName",
+              "Sender Number: $senderNumber",
               textAlign: TextAlign.start,
               style: const TextStyle(
                 fontWeight: FontWeight.w500,

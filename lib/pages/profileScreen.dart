@@ -7,11 +7,22 @@ import 'package:e_commerce_app/pages/wishList.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../auth/signIn.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final fireStore = FirebaseFirestore.instance
+      .collection('Users');
 
   @override
   Widget build(BuildContext context) {
@@ -153,8 +164,10 @@ class Profile extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           FirebaseAuth.instance.signOut();
-                          Navigator.pop(context,
-                              MaterialPageRoute(builder: (context) => const SignIn()));
+                          Navigator.pop(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SignIn()));
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -221,10 +234,12 @@ class Profile extends StatelessWidget {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            _showDialog(context);
+                          },
                           child: const Icon(
-                            FontAwesomeIcons.angleRight,
-                            size: 24,
+                            FontAwesomeIcons.userPlus,
+                            size: 20,
                             color: Colors.white,
                           ),
                         ),
@@ -240,110 +255,264 @@ class Profile extends StatelessWidget {
                     color: Colors.white,
                   ),
                   width: MediaQuery.of(context).size.width * 0.95,
-                  height: 180,
+                  height: 200,
                   padding: const EdgeInsets.all(8),
                   child: Column(
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Please complete your profile.",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.solidUser,
-                            size: 18,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Username",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                isDense: true,
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                hintText: "Enter your name",
-                                hintStyle: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey,
+                      StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('Users')
+                            .snapshots(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData) {
+                            return SizedBox(
+                              height: 180,
+                              width: MediaQuery.of(context).size.width * 0.95,
+                              child: ListView.builder(
+                                  itemCount: snapshot.data!.docs.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Column(
+                                      children: [
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Icon(
+                                              FontAwesomeIcons.solidUser,
+                                              size: 18,
+                                              color: Colors.black,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              "Username",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              snapshot.data!.docs[index]
+                                                  ['name'],
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Icon(
+                                              FontAwesomeIcons.solidEnvelope,
+                                              size: 18,
+                                              color: Colors.black,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              "Email",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              snapshot.data!.docs[index]
+                                                  ['email'],
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Icon(
+                                              FontAwesomeIcons.phone,
+                                              size: 18,
+                                              color: Colors.black,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              "Mobile Number",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              snapshot.data!.docs[index]
+                                                  ['phone'],
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                            );
+                          }
+                          return SizedBox(
+                            height: 180,
+                            width: MediaQuery.of(context).size.width * 0.95,
+                            child: const Column(
+                              children: [
+                                Text(
+                                  "Please complete your profile.",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.red,
+                                  ),
                                 ),
-                              ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.solidUser,
+                                      size: 18,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Username",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Please complete your profile.",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.solidEnvelope,
+                                      size: 18,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Email",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Please enter your email.",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.phone,
+                                      size: 18,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Mobile Number",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Please enter your mobile number",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.solidEnvelope,
-                            size: 18,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Email",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.phone,
-                            size: 18,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Mobile Number",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -517,7 +686,7 @@ class Profile extends StatelessWidget {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const SenderDetails()));
+                                  builder: (context) => SenderDetails()));
                         },
                         child: const Icon(
                           FontAwesomeIcons.angleRight,
@@ -539,6 +708,124 @@ class Profile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Update Profile', style: TextStyle(fontSize: 16)),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xffCCCCCC),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xff66CC99),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter email';
+                    }
+                    return null;
+                  },
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xffCCCCCC),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xff66CC99),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter phone number';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xffCCCCCC),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xff66CC99),
+                      ),
+                    ),
+                  ),
+                ),
+
+              ],
+            )
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Update', style: TextStyle(fontSize: 16)),
+              onPressed: () {
+                if(_nameController.text.isNotEmpty && _emailController.text.isNotEmpty && _phoneController.text.isNotEmpty) {
+                  fireStore.doc().set({
+                    'name': _nameController.text,
+                    'email': _emailController.text,
+                    'phone': _phoneController.text,
+                  }).then((value) => Navigator.of(dialogContext).pop());
+                }
+              }
+            ),
+            TextButton(
+              child: const Text('Cancel', style: TextStyle(fontSize: 16)),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

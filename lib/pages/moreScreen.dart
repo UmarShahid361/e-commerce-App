@@ -142,7 +142,7 @@ class MoreScreen extends StatelessWidget {
                           length: MediaQuery.of(context).size.width * 0.80),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const SenderDetails()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => SenderDetails()));
                         },
                         child: const MoreDisplay(
                             text: "Sender Details", iconData: Icons.person, colorData: Colors.black,),

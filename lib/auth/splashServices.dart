@@ -14,7 +14,7 @@ class SplashServices {
     if(user != null){
       Timer(
           const Duration(seconds: 3),
-              () => Navigator.pop(context,
+              () => Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const MainScreen())));
     }
     else {
