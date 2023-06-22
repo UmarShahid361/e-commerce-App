@@ -13,7 +13,7 @@ class BankCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         width: MediaQuery.of(context).size.width * 0.95,
-        height: 75,
+        height: 95,
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -30,6 +30,21 @@ class BankCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {},
+                    child: const Icon(Icons.edit, size: 22,)),
+                const SizedBox(width: 10,),
+                GestureDetector(
+                    onTap: () {},
+                    child: const Icon(Icons.delete, size: 22,)),
+                const SizedBox(
+                  width: 5,
+                )
+              ],
+            ),
             Text(
               "Account Number: $accountNumber",
               textAlign: TextAlign.start,

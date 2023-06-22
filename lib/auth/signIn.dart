@@ -100,7 +100,7 @@ class _SignInState extends State<SignIn> {
                   child: const Text("Login"),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

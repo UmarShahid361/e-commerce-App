@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../utils/utils.dart';
+import '../../../utils/utils.dart';
 
 class AddSenderDetails extends StatefulWidget {
   const AddSenderDetails({super.key});
@@ -28,6 +28,7 @@ class _AddSenderDetailsState extends State<AddSenderDetails> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 20,),
             Padding(
               padding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 5),

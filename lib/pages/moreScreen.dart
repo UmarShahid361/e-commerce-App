@@ -16,6 +16,7 @@ import 'package:store_redirect/store_redirect.dart';
 
 import '../auth/signIn.dart';
 
+
 class MoreScreen extends StatelessWidget {
   const MoreScreen({Key? key}) : super(key: key);
 
@@ -220,7 +221,7 @@ class MoreScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           FirebaseAuth.instance.signOut();
-                          Navigator.pop(context,
+                          Navigator.pushReplacement(context,
                               MaterialPageRoute(builder: (context) => const SignIn()));
                         },
                         child: const MoreDisplay(

@@ -21,8 +21,14 @@ class _ProfileState extends State<Profile> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final fireStore = FirebaseFirestore.instance
-      .collection('Users');
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  String? getCurrentUserId() {
+    final auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final uid = user?.uid;
+    return uid;
+  }
+  final fireStore = FirebaseFirestore.instance.collection('Users');
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +78,10 @@ class _ProfileState extends State<Profile> {
                 ),
                 const CircleAvatar(
                   radius: 30,
+                  backgroundColor: Color(0xff66CC99),
                   child: Icon(
                     FontAwesomeIcons.user,
+                    color: Colors.white,
                     size: 40,
                   ),
                 ),
@@ -101,6 +109,7 @@ class _ProfileState extends State<Profile> {
                     children: [
                       GestureDetector(
                         onTap: () {
+                          print(getCurrentUserId());
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -265,15 +274,11 @@ class _ProfileState extends State<Profile> {
                             .snapshots(),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData) {
+                          if (!snapshot.hasData) {
                             return SizedBox(
                               height: 180,
                               width: MediaQuery.of(context).size.width * 0.95,
-                              child: ListView.builder(
-                                  itemCount: snapshot.data!.docs.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return Column(
+                              child: Column(
                                       children: [
                                         const SizedBox(
                                           height: 10,
@@ -302,7 +307,7 @@ class _ProfileState extends State<Profile> {
                                         Row(
                                           children: [
                                             Text(
-                                              snapshot.data!.docs[index]
+                                              snapshot.data!.docs[0]
                                                   ['name'],
                                               style: const TextStyle(
                                                 fontSize: 15,
@@ -339,7 +344,7 @@ class _ProfileState extends State<Profile> {
                                         Row(
                                           children: [
                                             Text(
-                                              snapshot.data!.docs[index]
+                                              snapshot.data!.docs[0]
                                                   ['email'],
                                               style: const TextStyle(
                                                 fontSize: 15,
@@ -376,7 +381,7 @@ class _ProfileState extends State<Profile> {
                                         Row(
                                           children: [
                                             Text(
-                                              snapshot.data!.docs[index]
+                                              snapshot.data!.docs[0]
                                                   ['phone'],
                                               style: const TextStyle(
                                                 fontSize: 15,
@@ -387,8 +392,7 @@ class _ProfileState extends State<Profile> {
                                           ],
                                         ),
                                       ],
-                                    );
-                                  }),
+                                    ),
                             );
                           }
                           return SizedBox(
@@ -809,7 +813,7 @@ class _ProfileState extends State<Profile> {
               child: const Text('Update', style: TextStyle(fontSize: 16)),
               onPressed: () {
                 if(_nameController.text.isNotEmpty && _emailController.text.isNotEmpty && _phoneController.text.isNotEmpty) {
-                  fireStore.doc().set({
+                  fireStore.doc(getCurrentUserId()).update({
                     'name': _nameController.text,
                     'email': _emailController.text,
                     'phone': _phoneController.text,
