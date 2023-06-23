@@ -34,57 +34,63 @@ class _AddressesState extends State<Addresses> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: SizedBox(
-            height: MediaQuery.of(context).size.height,
             width: double.infinity,
+            height: MediaQuery.of(context).size.height,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StreamBuilder<QuerySnapshot>(
                   stream: fireStore,
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      return SizedBox(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height,
-                        child: Column(
-                          children: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      if(snapshot.data!.docs.isNotEmpty){
+                        return Expanded(
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height,
+                            child: Column(
+                              children: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
                                               const AddAddressDetails()));
-                                },
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.add),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Text("Add Address Details"),
-                                  ],
-                                )),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: snapshot.data.docs.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: AddressCard(name: snapshot.data.docs[index]
-                                    ['name'], number: snapshot.data.docs[index]
-                                    ['number'], email: snapshot.data.docs[index]
-                                        ['email'], address: snapshot.data.docs[index]
-                                    ['address'], postalCode: snapshot.data.docs[index]
-                                    ['postalCode'], city: snapshot.data.docs[index]
-                                    ['city'])
-                                  );
-                                },
-                              ),
+                                    },
+                                    child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text("Add Address Details"),
+                                      ],
+                                    )),
+                                Expanded(
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data.docs.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: AddressCard(name: snapshot.data.docs[index]
+                                          ['name'], number: snapshot.data.docs[index]
+                                          ['number'], email: snapshot.data.docs[index]
+                                          ['email'], address: snapshot.data.docs[index]
+                                          ['address'], postalCode: snapshot.data.docs[index]
+                                          ['postalCode'], city: snapshot.data.docs[index]
+                                          ['city'])
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
+                          ),
+                        );
+                      }
                     }
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -95,7 +101,7 @@ class _AddressesState extends State<Addresses> {
                       children: [
                         const Center(
                           child: Text(
-                            "You have not added sender details yet.",
+                            "You have not added address details yet.",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,

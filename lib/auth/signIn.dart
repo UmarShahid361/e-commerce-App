@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app/pages/MainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../utils/utils.dart';
 
 class SignIn extends StatefulWidget {
-
   const SignIn({super.key});
 
   @override
@@ -18,6 +17,14 @@ class _SignInState extends State<SignIn> {
   final _auth = FirebaseAuth.instance;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final fireStore = FirebaseFirestore.instance.collection('Users');
+
+  String? getCurrentUserId() {
+    final auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final uid = user?.uid;
+    return uid;
+  }
 
   @override
   void dispose() {
@@ -76,31 +83,6 @@ class _SignInState extends State<SignIn> {
                 return null;
               },
             ),
-            const SizedBox(height: 15),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff66CC99),
-                foregroundColor: Colors.white,
-                minimumSize: const Size(150, 50),
-              ),
-                onPressed: signIn,
-                icon: const Icon(
-                  Icons.lock_open,
-                  size: 32,
-                ),
-                label: const Text('Sign In')),
-            const SizedBox(height: 25),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Already have an account?"),
-                TextButton(
-                  onPressed: () {
-                  },
-                  child: const Text("Login"),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -112,12 +94,18 @@ class _SignInState extends State<SignIn> {
       loading = true;
     });
     _auth
-        .createUserWithEmailAndPassword(
-        email: emailController.text.toString(),
-        password: passwordController.text.toString())
+        .signInWithEmailAndPassword(
+            email: emailController.text.toString(),
+            password: passwordController.text.toString())
         .then((value) {
-      Utils().toastMessage("Account Created Successfully");
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const MainScreen()));
+      fireStore.doc(getCurrentUserId()).set({
+        'name': "Please enter your name",
+        'email': "Please enter your email",
+        'phoneNo': "123456",
+      });
+      Utils().toastMessage("Signed In Successfully");
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const MainScreen()));
       setState(() {
         loading = false;
       });

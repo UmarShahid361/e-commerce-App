@@ -115,7 +115,7 @@ class _AddSenderDetailsState extends State<AddSenderDetails> {
                     color: Colors.white,
                   )
                       : const Text(
-                    "Add Bank Details",
+                    "Add Sender Details",
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,

@@ -31,44 +31,47 @@ class SenderDetails extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: double.infinity,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StreamBuilder<QuerySnapshot>(
                     stream: fireStore,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.hasData) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    width: double.infinity,
-                    child: Column(
-                      children: [
-                        TextButton(onPressed: (){
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const AddSenderDetails()));
-                        }, child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add),
-                            SizedBox(width: 5,),
-                            Text("Add Sender Details"),
-                          ],
-                        )),
-                        Expanded(
-                          child: ListView.builder(
-                        itemCount: snapshot.data.docs.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SenderCard(
-                              senderName: snapshot.data.docs[index]['senderName'],
-                              senderNumber: snapshot.data.docs[index]
-                                  ['senderNumber'],
-                            ),
-                          );
-                        },
-                      )),
-                      ],
-                    ),
-                  );
+                if (snapshot.connectionState == ConnectionState.active) {
+                  if(snapshot.data!.docs.isNotEmpty){
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          TextButton(onPressed: (){
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => const AddSenderDetails()));
+                          }, child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add),
+                              SizedBox(width: 5,),
+                              Text("Add Sender Details"),
+                            ],
+                          )),
+                          Expanded(
+                              child: ListView.builder(
+                                itemCount: snapshot.data.docs.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SenderCard(
+                                      senderName: snapshot.data.docs[index]['senderName'],
+                                      senderNumber: snapshot.data.docs[index]
+                                      ['senderNumber'],
+                                    ),
+                                  );
+                                },
+                              )),
+                        ],
+                      ),
+                    );
+                  }
                 }
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
