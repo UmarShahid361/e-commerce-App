@@ -83,9 +83,26 @@ class _SignInState extends State<SignIn> {
                 return null;
               },
             ),
-            ElevatedButton(onPressed: () {
-              signIn();
-            }, child: Text("signin "))
+            const SizedBox(height: 15.0),
+            ElevatedButton(
+              onPressed: () {
+                signIn();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                width: 200,
+                height: 50,
+                child: const Center(
+                  child: Text(
+                    "Sign In ",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

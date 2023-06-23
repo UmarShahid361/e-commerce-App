@@ -19,16 +19,15 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
   final FirebaseAuth auth = FirebaseAuth.instance;
+
   String? getCurrentUserId() {
     final auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
     final uid = user?.uid;
     return uid;
   }
+
   final fireStore = FirebaseFirestore.instance.collection('Users').get();
 
   @override
@@ -172,11 +171,11 @@ class _ProfileState extends State<Profile> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          FirebaseAuth.instance.signOut();
-                          Navigator.pop(
+                          Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => const SignIn()));
+                          FirebaseAuth.instance.signOut();
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -208,55 +207,50 @@ class _ProfileState extends State<Profile> {
                 const SizedBox(
                   height: 20,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    FirebaseAuth.instance.signOut();
-                  },
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xff66CC99),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(5),
-                          topRight: Radius.circular(5)),
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.95,
-                    height: 50,
-                    padding: const EdgeInsets.all(8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          FontAwesomeIcons.user,
-                          size: 24,
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xff66CC99),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5)),
+                  ),
+                  width: MediaQuery.of(context).size.width * 0.95,
+                  height: 50,
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        FontAwesomeIcons.user,
+                        size: 24,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      const Text(
+                        'Profile',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),
-                        const SizedBox(
-                          width: 20,
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          _showDialog(context);
+                        },
+                        child: const Icon(
+                          FontAwesomeIcons.userPlus,
+                          size: 20,
+                          color: Colors.white,
                         ),
-                        const Text(
-                          'Profile',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: () {
-                            _showDialog(context);
-                          },
-                          child: const Icon(
-                            FontAwesomeIcons.userPlus,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                    ],
                   ),
                 ),
                 Container(
@@ -270,13 +264,13 @@ class _ProfileState extends State<Profile> {
                     children: [
                       StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance
-                            .collection('Users').doc(getCurrentUserId())
+                            .collection('Users')
+                            .doc(getCurrentUserId())
                             .snapshots(),
-                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-
-                          print(getCurrentUserId());
-
-                          if(snapshot.connectionState == ConnectionState.active) {
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.active) {
                             return Expanded(
                               child: ListView.builder(
                                 scrollDirection: Axis.vertical,
@@ -290,14 +284,14 @@ class _ProfileState extends State<Profile> {
                                   }
                                   return Column(
                                     children: [
-                                      if(snapshot.data['name'] ==
-                                          "Please enter your name" ||
-                                          snapshot.data!['name'] ==
-                                              "" ||
+                                      if (snapshot.data['name'] ==
+                                              "Please enter your name" ||
+                                          snapshot.data!['name'] == "" ||
                                           snapshot.data['email'] ==
                                               "Please enter your email" ||
-                                          snapshot.data['email'] ==
-                                              "" || snapshot.data['phoneNo'] == "123456" ||
+                                          snapshot.data['email'] == "" ||
+                                          snapshot.data['phoneNo'] ==
+                                              "123456" ||
                                           snapshot.data['phoneNo'] == "")
                                         const Text(
                                           "Please complete your profile.",
@@ -305,13 +299,14 @@ class _ProfileState extends State<Profile> {
                                             color: Colors.red,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w500,
-                                          ),),
+                                          ),
+                                        ),
                                       const SizedBox(
                                         height: 6,
                                       ),
                                       const Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.start,
+                                            MainAxisAlignment.start,
                                         children: [
                                           Icon(
                                             FontAwesomeIcons.solidUser,
@@ -347,7 +342,7 @@ class _ProfileState extends State<Profile> {
                                       ),
                                       const Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.start,
+                                            MainAxisAlignment.start,
                                         children: [
                                           Icon(
                                             FontAwesomeIcons.solidEnvelope,
@@ -383,7 +378,7 @@ class _ProfileState extends State<Profile> {
                                       ),
                                       const Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.start,
+                                            MainAxisAlignment.start,
                                         children: [
                                           Icon(
                                             FontAwesomeIcons.phone,
@@ -421,8 +416,9 @@ class _ProfileState extends State<Profile> {
                             );
                           }
 
-                          return Center(child: CircularProgressIndicator(),);
-
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         },
                       ),
                     ],
@@ -632,16 +628,15 @@ class _ProfileState extends State<Profile> {
       final uid = user?.uid;
       return uid;
     }
+
     updateData(id, value1, value2, value3) async {
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(id)
-          .update({
+      await FirebaseFirestore.instance.collection('Users').doc(id).update({
         'name': value1,
         'email': value2,
         'phoneNo': value3,
       });
     }
+
     return showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -651,89 +646,87 @@ class _ProfileState extends State<Profile> {
           ),
           title: const Text('Update Profile', style: TextStyle(fontSize: 16)),
           content: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
+              child: ListBody(
+            children: [
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xffCCCCCC),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffCCCCCC),
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xff66CC99),
-                      ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xff66CC99),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter email';
-                    }
-                    return null;
-                  },
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TextFormField(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter email';
+                  }
+                  return null;
+                },
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xffCCCCCC),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffCCCCCC),
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xff66CC99),
-                      ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xff66CC99),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter phone number';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.phone,
-                  controller: phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TextFormField(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter phone number';
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.phone,
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number',
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xffCCCCCC),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffCCCCCC),
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xff66CC99),
-                      ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xff66CC99),
                     ),
                   ),
                 ),
-
-              ],
-            )
-          ),
+              ),
+            ],
+          )),
           actions: <Widget>[
             TextButton(
               child: const Text('Update', style: TextStyle(fontSize: 16)),
@@ -741,12 +734,14 @@ class _ProfileState extends State<Profile> {
                 if (nameController.text.isNotEmpty ||
                     emailController.text.isNotEmpty ||
                     phoneController.text.isNotEmpty) {
-                  Utils().toastMessage('Please enter name');
-                  updateData(getCurrentUserId(), nameController.text.toString(),
+                  updateData(
+                      getCurrentUserId(),
+                      nameController.text.toString(),
                       emailController.text.toString(),
                       phoneController.text.toString());
                   setState(() {});
                   Utils().toastMessage('Profile Updated Successfully');
+                  Navigator.of(dialogContext).pop();
                 }
               },
             ),
