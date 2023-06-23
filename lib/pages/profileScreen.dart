@@ -268,143 +268,161 @@ class _ProfileState extends State<Profile> {
                   padding: const EdgeInsets.all(8),
                   child: Column(
                     children: [
-                      StreamBuilder<QuerySnapshot>(
+                      StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance
-                            .collection('Users')
+                            .collection('Users').doc(getCurrentUserId())
                             .snapshots(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          return Expanded(
-                            child: ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              itemCount: snapshot.data!.docs.length,
-                              itemBuilder: (BuildContext context, int index){
-                                if(snapshot.connectionState == ConnectionState.waiting) {
-                                  return const CircularProgressIndicator(
-                                    strokeWidth: 3,
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+
+                          print(getCurrentUserId());
+
+                          if(snapshot.connectionState == ConnectionState.active) {
+                            return Expanded(
+                              child: ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                itemCount: 1,
+                                itemBuilder: (BuildContext context, int index) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                    );
+                                  }
+                                  return Column(
+                                    children: [
+                                      if(snapshot.data['name'] ==
+                                          "Please enter your name" ||
+                                          snapshot.data!['name'] ==
+                                              "" ||
+                                          snapshot.data['email'] ==
+                                              "Please enter your email" ||
+                                          snapshot.data['email'] ==
+                                              "" || snapshot.data['phoneNo'] == "123456" ||
+                                          snapshot.data['phoneNo'] == "")
+                                        const Text(
+                                          "Please complete your profile.",
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),),
+                                      const SizedBox(
+                                        height: 6,
+                                      ),
+                                      const Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            FontAwesomeIcons.solidUser,
+                                            size: 18,
+                                            color: Colors.black,
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            "Username",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            snapshot.data['name'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            FontAwesomeIcons.solidEnvelope,
+                                            size: 18,
+                                            color: Colors.black,
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            "Email",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            snapshot.data['email'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            FontAwesomeIcons.phone,
+                                            size: 18,
+                                            color: Colors.black,
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            "Mobile Number",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            snapshot.data['phoneNo'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   );
-                                }
-                              return Column(
-                                children: [
-                                  if(snapshot.data!.docs[index]['name'] == "Please enter your name" || snapshot.data!.docs[index]['name'] == "" || snapshot.data!.docs[index]['email'] == "Please enter your email" || snapshot.data!.docs[index]['email'] == "" || snapshot.data!.docs[index]['phoneNo'] == "123456" || snapshot.data!.docs[index]['phoneNo'] == "")
-                                    const Text("Please complete your profile.", style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),),
-                                  const SizedBox(
-                                    height: 6,
-                                  ),
-                                  const Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.solidUser,
-                                        size: 18,
-                                        color: Colors.black,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "Username",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        snapshot.data!.docs[index]['name'],
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.solidEnvelope,
-                                        size: 18,
-                                        color: Colors.black,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "Email",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        snapshot.data!.docs[index]['email'],
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.phone,
-                                        size: 18,
-                                        color: Colors.black,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "Mobile Number",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        snapshot.data!.docs[index]['phoneNo'],
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            },
-                            ),
-                          );
+                                },
+                              ),
+                            );
+                          }
+
+                          return Center(child: CircularProgressIndicator(),);
+
                         },
                       ),
                     ],

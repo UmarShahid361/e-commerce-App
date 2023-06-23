@@ -83,6 +83,9 @@ class _SignInState extends State<SignIn> {
                 return null;
               },
             ),
+            ElevatedButton(onPressed: () {
+              signIn();
+            }, child: Text("signin "))
           ],
         ),
       ),
