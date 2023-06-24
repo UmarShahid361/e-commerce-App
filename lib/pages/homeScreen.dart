@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../widgets/CustomCard.dart';
 
@@ -19,12 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int activeIndex = 0;
 
-  final urlImages = [
-    "assets/kakashi.jpeg",
-    "assets/pain.jpeg",
-    "assets/kakashi.jpeg",
-    "assets/pain.jpeg",
-  ];
+  List? urlImages = [];
 
   @override
   Widget build(BuildContext context) {
@@ -115,34 +111,54 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(
                 height: 10,
               ),
-              CarouselSlider.builder(
-                itemCount: urlImages.length,
-                itemBuilder: (context, index, realIndex) {
-                  final urlImage = urlImages[index];
-                  return buildImage(urlImage, index);
+              FutureBuilder(
+                future: FirebaseFirestore.instance.collection("Banners").get(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return const Center(
+                      child: Text("Something went wrong"),
+                    );
+                  }
+                  return Column(
+                    children: [
+                      CarouselSlider.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index, realIndex) {
+                          final urlImage = snapshot.data!.docs[index]["url"];
+                          return buildImage(
+                              urlImage, snapshot.data!.docs.length);
+                        },
+                        options: CarouselOptions(
+                          height: 200,
+                          autoPlay: true,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              activeIndex = index;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      buildIndicator(activeIndex, snapshot.data!.docs),
+                    ],
+                  );
                 },
-                options: CarouselOptions(
-                  height: 200,
-                  autoPlay: true,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      activeIndex = index;
-                    });
-                  },
-                ),
               ),
               const SizedBox(
                 height: 10,
               ),
-              buildIndicator(activeIndex, urlImages),
-              const SizedBox(
-                height: 10,
-              ),
-              const CustomCard(title: "Neji", discountedPrice: "40", price: "80", OFF: "50"),
+              const CustomCard(
+                  title: "Neji", discountedPrice: "40", price: "80", OFF: "50"),
               const SizedBox(
                 height: 5,
               ),
-              const CustomCard(title: "Sasuke", discountedPrice: "200", price:"340", OFF: "40"),
+              const CustomCard(
+                  title: "Sasuke",
+                  discountedPrice: "200",
+                  price: "340",
+                  OFF: "40"),
             ],
           ),
         ),
@@ -153,16 +169,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
 Widget buildImage(String urlImage, int index) => Container(
       margin: const EdgeInsets.symmetric(horizontal: 5),
-      child: Image.asset(
+      child: Image.network(
         urlImage,
         fit: BoxFit.cover,
       ),
     );
 
-Widget buildIndicator(int activeIndex, List urlImages) =>
-    AnimatedSmoothIndicator(
+Widget buildIndicator(int activeIndex, List count) => AnimatedSmoothIndicator(
       activeIndex: activeIndex,
-      count: urlImages.length,
+      count: count.length,
       effect: const WormEffect(
         dotColor: Colors.grey,
         activeDotColor: Color(0xff66CC99),
