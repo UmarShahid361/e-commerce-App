@@ -1,6 +1,7 @@
 import 'package:e_commerce_app/pages/cart.dart';
 import 'package:e_commerce_app/pages/profilePages/search.dart';
 import 'package:e_commerce_app/pages/wishList.dart';
+import 'package:e_commerce_app/widgets/CustomCard.dart';
 import 'package:e_commerce_app/widgets/simpleLine.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -314,14 +315,16 @@ class _CategoriesState extends State<Categories> {
 
 class ProductList extends StatelessWidget {
   final String item;
-  final String collectionPath = 'Single Pieces';
-  final String subCollectionPath = 'subCategory';
-  const ProductList({Key? key, required this.item}) : super(key: key);
+  final String collectionPath = 'Products';
+  final String subCollectionPath = 'variants';
+  ProductList({Key? key, required this.item}) : super(key: key);
 
+  final fireStore = FirebaseFirestore.instance.collectionGroup("variants").snapshots();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0.0,
         title: Text(item),
         centerTitle: true,
       ),
@@ -329,7 +332,7 @@ class ProductList extends StatelessWidget {
         children: [
           StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection(collectionPath).snapshots(),
+                  .collection(collectionPath).where('category', isEqualTo: item).snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -343,14 +346,22 @@ class ProductList extends StatelessWidget {
                   );
                 }
                 return Expanded(
-                    child: ListView.builder(
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    return  ListTile(
-                      title: Text(snapshot.data!.docs[index]['category']),
-                    );
-                  },
-                ),);
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                  return CustomCard(
+                    id: snapshot.data!.docs[index].id,
+                    title: snapshot.data!.docs[index]['title'],
+                    price: snapshot.data!.docs[index]['price'],
+                    discountedPrice: snapshot.data!.docs[index]
+                        ['discountedPrice'],
+                    OFF: snapshot.data!.docs[index]['off'],
+                    url: snapshot.data!.docs[index]['imageURL'],
+                    description: snapshot.data!.docs[index]['description'],
+                  );
+                    },
+                  ),
+                );
               }),
         ],
       ),

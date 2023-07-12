@@ -1,4 +1,3 @@
-import 'package:e_commerce_app/pages/cart.dart';
 import 'package:e_commerce_app/pages/profilePages/search.dart';
 import 'package:e_commerce_app/pages/wishList.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../widgets/CustomCard.dart';
+import 'cart.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,149 +19,198 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int activeIndex = 0;
-
   List? urlImages = [];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xff66CC99),
-          statusBarIconBrightness: Brightness.light,
-        ),
-        elevation: 0.0,
-        title: const Text("Fashionary Mart"),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const WishList()));
-            },
-            child: const Icon(FontAwesomeIcons.solidHeart, size: 22),
-          ),
-          const SizedBox(
-            width: 15,
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Cart()));
-            },
-            child: const Icon(FontAwesomeIcons.cartShopping, size: 22),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 80,
-                padding: const EdgeInsets.all(12.0),
-                decoration: const BoxDecoration(
-                  color: Color(0xff66CC99),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: 160,
+            padding: const EdgeInsets.all(12.0),
+            decoration: const BoxDecoration(
+              color: Color(0xff66CC99),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 20,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Search()));
-                      },
-                      child: Container(
-                        height: 45,
-                        width: MediaQuery.of(context).size.width * 0.90,
-                        decoration: BoxDecoration(
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Fashionary Mart",
+                        style: TextStyle(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Row(
-                          children: [
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Icon(
-                              FontAwesomeIcons.magnifyingGlass,
-                              size: 20,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "Search Products Here...",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              FutureBuilder(
-                future: FirebaseFirestore.instance.collection("Banners").get(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return const Center(
-                      child: Text("Something went wrong"),
-                    );
-                  }
-                  return Column(
-                    children: [
-                      CarouselSlider.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index, realIndex) {
-                          final urlImage = snapshot.data!.docs[index]["url"];
-                          return buildImage(
-                              urlImage, snapshot.data!.docs.length);
+                      const SizedBox(width: 140,),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const WishList()));
                         },
-                        options: CarouselOptions(
-                          height: 200,
-                          autoPlay: true,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              activeIndex = index;
-                            });
-                          },
+                        child: const Icon(
+                          FontAwesomeIcons.solidHeart,
+                          size: 22,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(
-                        height: 10,
+                        width: 10,
                       ),
-                      buildIndicator(activeIndex, snapshot.data!.docs),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Cart()));
+                        },
+                        child: const Icon(
+                          FontAwesomeIcons.cartShopping,
+                          size: 22,
+                          color: Colors.white,
+                        ),
+                      ),
                     ],
-                  );
-                },
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const CustomCard(
-                  title: "Neji", discountedPrice: "40", price: "80", OFF: "50"),
-              const SizedBox(
-                height: 5,
-              ),
-              const CustomCard(
-                  title: "Sasuke",
-                  discountedPrice: "200",
-                  price: "340",
-                  OFF: "40"),
-            ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Search()));
+                  },
+                  child: Container(
+                    height: 45,
+                    width: MediaQuery.of(context).size.width * 0.90,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Row(
+                      children: [
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Icon(
+                          FontAwesomeIcons.magnifyingGlass,
+                          size: 20,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Search Products Here...",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          const SizedBox(
+            height: 10,
+          ),
+          FutureBuilder(
+            future: FirebaseFirestore.instance.collection("Banners").get(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text("Something went wrong"),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.waiting &&
+                  snapshot.data == null) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CarouselSlider.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index, realIndex) {
+                      final urlImage = snapshot.data!.docs[index]["url"];
+                      return buildImage(urlImage, snapshot.data!.docs.length);
+                    },
+                    options: CarouselOptions(
+                      height: 200,
+                      disableCenter: true,
+                      enableInfiniteScroll: true,
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      autoPlay: true,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          activeIndex = index;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  buildIndicator(activeIndex, snapshot.data!.docs),
+                ],
+              );
+            },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          StreamBuilder<QuerySnapshot>(
+              stream:
+                  FirebaseFirestore.instance.collection('Products').snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting &&
+                    snapshot.data == null) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text("Something went wrong"),
+                  );
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    return CustomCard(
+                      id: snapshot.data!.docs[index].id,
+                      title: snapshot.data!.docs[index]['title'],
+                      price: snapshot.data!.docs[index]['price'],
+                      discountedPrice: snapshot.data!.docs[index]
+                      ['discountedPrice'],
+                      OFF: snapshot.data!.docs[index]['off'],
+                      url: snapshot.data!.docs[index]['imageURL'],
+                      description: snapshot.data!.docs[index]['description'],
+                    );
+                  },
+                );
+              }),
+        ],
       ),
     );
   }

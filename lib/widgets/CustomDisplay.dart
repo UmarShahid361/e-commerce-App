@@ -1,14 +1,32 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app/pages/morePages/usefulLinks.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import '../pages/cart.dart';
 import '../pages/homeScreen.dart';
 import '../pages/wishList.dart';
 
 class CustomDisplay extends StatefulWidget {
-  const CustomDisplay({super.key});
+  final String title;
+  final String price;
+  final String discountedPrice;
+  final String OFF;
+  final List url;
+  final String description;
+
+  const CustomDisplay(
+      {super.key,
+      required this.title,
+      required this.price,
+      required this.discountedPrice,
+      required this.OFF,
+      required this.url,
+      required this.description});
+
+
   @override
   State<CustomDisplay> createState() => _CustomDisplayState();
 }
@@ -16,13 +34,7 @@ class CustomDisplay extends StatefulWidget {
 class _CustomDisplayState extends State<CustomDisplay> {
   int activeIndex = 0;
   int _currentIndex = 0;
-
-  final urlImages = [
-    "assets/kakashi.jpeg",
-    "assets/pain.jpeg",
-    "assets/kakashi.jpeg",
-    "assets/pain.jpeg",
-  ];
+  final Uri whatsappNumber = Uri.parse('https://wa.me/+923114749583');
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +76,9 @@ class _CustomDisplayState extends State<CustomDisplay> {
               child: Column(
                 children: [
                   CarouselSlider.builder(
-                    itemCount: urlImages.length,
+                    itemCount: widget.url.length,
                     itemBuilder: (context, index, realIndex) {
-                      final urlImage = urlImages[index];
+                      final urlImage = widget.url[index];
                       return buildImage(urlImage, index);
                     },
                     options: CarouselOptions(
@@ -81,7 +93,7 @@ class _CustomDisplayState extends State<CustomDisplay> {
                   const SizedBox(
                     height: 10,
                   ),
-                  buildIndicator(activeIndex, urlImages),
+                  buildIndicator(activeIndex, widget.url),
                   const SizedBox(
                     height: 10,
                   ),
@@ -109,17 +121,19 @@ class _CustomDisplayState extends State<CustomDisplay> {
                     ),
                     Expanded(
                       child: ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: urlImages.length,
-                          itemBuilder: (BuildContext context, int index){
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: CircleAvatar(
-                              radius: 40,
-                              foregroundImage: AssetImage(urlImages[index],),
-                            ),
-                          );
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: widget.url.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CircleAvatar(
+                                radius: 40,
+                                foregroundImage: CachedNetworkImageProvider(
+                                  widget.url[index],
+                                ),
+                              ),
+                            );
                           }),
                     ),
                   ],
@@ -136,48 +150,61 @@ class _CustomDisplayState extends State<CustomDisplay> {
             SizedBox(
               width: MediaQuery.of(context).size.width,
               height: 75,
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Title", style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                    ),),
+                    Text(
+                      widget.title,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     Row(
                       children: [
                         Text(
-                          "40",
-                          style: TextStyle(
+                          widget.discountedPrice,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 4.0,
                         ),
                         Text(
-                          "80",
-                          style: TextStyle(
+                          widget.price,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
-                            decoration:
-                            TextDecoration.lineThrough,
+                            decoration: TextDecoration.lineThrough,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 4.0,
                         ),
-                        Text(
-                          '(50% off)',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xff66CC99),
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              widget.OFF,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xff66CC99),
+                              ),
+                            ),
+                            const Text(
+                              "% off",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xff66CC99),
+                              ),
+                            )
+                          ],
                         ),
                       ],
                     )
@@ -197,33 +224,38 @@ class _CustomDisplayState extends State<CustomDisplay> {
               width: MediaQuery.of(context).size.width,
               height: 80,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Available Sizes", style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Container(
-                    width: 100,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade400,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: const Center(
-                      child: Text("Free Size", style: TextStyle(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Available Sizes",
+                      style: TextStyle(
                         color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  )
-                ]
-              ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Container(
+                      width: 100,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade400,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Free Size",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                  ]),
             ),
             Container(
               width: MediaQuery.of(context).size.width,
@@ -235,23 +267,41 @@ class _CustomDisplayState extends State<CustomDisplay> {
             Container(
               padding: const EdgeInsets.all(8.0),
               width: MediaQuery.of(context).size.width,
-              height: 250,
-              child: const Column(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Product Details", style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),),
-                  SizedBox(
+                  const Text(
+                    "Product Details",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
                     height: 20,
                   ),
-                  Text("Disclaimer: Product color may slightly vary due to photographic lighting sources or your monitor settings.", style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),),
+                  FutureBuilder(
+                      future: FirebaseFirestore.instance
+                          .collection("Products")
+                          .get(),
+                      builder:
+                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text("Something went wrong");
+                        }
+                        return Expanded(
+                          child: Text(
+                            snapshot.data!.docs[0]["description"],
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        );
+                      }),
                 ],
               ),
             ),
@@ -282,10 +332,13 @@ class _CustomDisplayState extends State<CustomDisplay> {
                       SizedBox(
                         height: 6,
                       ),
-                      Text("Cash on Delivery", style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),),
+                      Text(
+                        "Cash on Delivery",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
                     ],
                   ),
                   Column(
@@ -299,16 +352,27 @@ class _CustomDisplayState extends State<CustomDisplay> {
                       const SizedBox(
                         height: 6,
                       ),
-                      const Text("  Defective\n  Products\nRefundable", style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),),
-                      TextButton(onPressed: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const Links()));
-                      }, child: const Text("Know More", style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xff66CC99),
-                      ),))
+                      const Text(
+                        "  Defective\n  Products\nRefundable",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const Links()));
+                          },
+                          child: const Text(
+                            "Know More",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xff66CC99),
+                            ),
+                          ))
                     ],
                   ),
                   const Column(
@@ -321,10 +385,13 @@ class _CustomDisplayState extends State<CustomDisplay> {
                       SizedBox(
                         height: 6,
                       ),
-                      Text("Free Shipping", style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),),
+                      Text(
+                        "Free Shipping",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -335,17 +402,43 @@ class _CustomDisplayState extends State<CustomDisplay> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-          currentIndex: _currentIndex,
-          items: const [
-        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.solidHeart, color: Colors.red,), label: "Wishlist",),
-        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.share,), label: "Share",),
-        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.whatsapp), label: "Inquiry",),
-      ],
-          onTap: (index){
-            setState(() {
-              _currentIndex = index;
-            });
-          },
+        currentIndex: _currentIndex,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(
+              FontAwesomeIcons.solidHeart,
+            ),
+            label: "Wishlist",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(FontAwesomeIcons.whatsapp),
+            label: "Inquiry",
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(FontAwesomeIcons.plus), label: "Add to Card"),
+        ],
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          if (index == 0) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const WishList()));
+          }
+          if (index == 1) {
+            launchUrl(whatsappNumber, mode: LaunchMode.externalApplication);
+          }
+          if (index == 2) {
+            showModalBottomSheet(
+                context: context,
+                builder: (context) => Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 350,
+                      decoration: BoxDecoration(color: Colors.grey[300]),
+                      child: const Text("Hello! Sinister Chill"),
+                    ));
+          }
+        },
       ),
     );
   }

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'CustomDisplay.dart';
 
 class CustomCard extends StatelessWidget {
-  const CustomCard({super.key, required this.title,required this.discountedPrice, required this.price, required this.OFF});
-
+  const CustomCard({super.key,required this.id, required this.title,required this.discountedPrice, required this.price, required this.OFF, required this.url, required this.description});
+  final String id;
   final String title;
   final String discountedPrice;
   final String price;
   final String OFF;
+  final List url;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -20,35 +22,164 @@ class CustomCard extends StatelessWidget {
       ),
       child: GestureDetector(
         onTap: () {
+          print(id);
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => CustomDisplay()));
+                  builder: (context) => CustomDisplay(title: title, price: price, discountedPrice: discountedPrice, OFF: OFF, url: url, description: description,)));
         },
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                Row(
+            SizedBox(
+              height: 180,
+              child: Row(
                   children: [
-                    const Expanded(
-                      child: Image(
-                        image: AssetImage("assets/kakashi.jpeg"),
-                        fit: BoxFit.cover,
+                    Expanded(
+                      flex: 10,
+                      child: Container(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: CachedNetworkImage(
+                          imageUrl: url[0],
+                          fit: BoxFit.cover,
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          progressIndicatorBuilder: (context, url, downloadProgress) =>
+                              Center(child: Opacity( opacity: 0.6, child: Image.asset('assets/pain.jpeg')),),
+                          errorWidget: (context, url, error) => const Icon(Icons.error, color: Color(0xff0D0D0D),),
+                        ),
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.all(4),
-                    ),
-                    const Expanded(
-                      child: Image(
-                        image: AssetImage("assets/pain.jpeg"),
-                        fit: BoxFit.cover,
+                    // Image 2 and Image 3
+                    if (url.length == 2)
+                      Expanded(
+                        flex: 8,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.only(bottom: 2),
+                                child: CachedNetworkImage(
+                                  imageUrl: url[1],
+                                  fit: BoxFit.cover,
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                      Center(child: Opacity( opacity: 0.6, child: Image.asset('assets/pain.jpeg')),),
+                                  errorWidget: (context, url, error) => const Icon(Icons.error, color: Color(0xff0D0D0D),),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    if (url.length == 3)
+                      Expanded(
+                        flex: 8,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.only(bottom: 2),
+                                child: CachedNetworkImage(
+                                  imageUrl: url[1],
+                                  fit: BoxFit.cover,
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                      Center(child: Opacity( opacity: 0.6, child: Image.asset('assets/pain.jpeg')),),
+                                  errorWidget: (context, url, error) => const Icon(Icons.error, color: Color(0xff0D0D0D),),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: CachedNetworkImage(
+                                  imageUrl: url[2],
+                                  fit: BoxFit.cover,
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                      Center(child: Opacity( opacity: 0.6, child: Image.asset('assets/pain.jpeg')),),
+                                  errorWidget: (context, url, error) => const Icon(Icons.error, color: Color(0xff0D0D0D),),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    if (url.length > 3)
+                      Expanded(
+                        flex: 8,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.only(bottom: 2),
+                                child: CachedNetworkImage(
+                                  imageUrl: url[1],
+                                  fit: BoxFit.cover,
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                      Center(child: Opacity( opacity: 0.6, child: Image.asset('assets/pain.jpeg')),),
+                                  errorWidget: (context, url, error) => const Icon(Icons.error, color: Color(0xff0D0D0D),),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: CachedNetworkImage(
+                                      imageUrl: url[2],
+                                      fit: BoxFit.cover,
+                                      height: MediaQuery.of(context).size.height,
+                                      width: MediaQuery.of(context).size.width,
+                                      progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                          Center(child: Opacity( opacity: 0.6, child: Image.asset('assets/pain.jpeg')),),
+                                      errorWidget: (context, url, error) => const Icon(Icons.error, color: Color(0xff0D0D0D),),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: MediaQuery.of(context).size.height,
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.4),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        (url.length - 3).toString() +
+                                            '+',
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    // Expanded(
+                    //   child: widget.url[index]
+                    // ),
+                    // Container(
+                    //   margin: const EdgeInsets.all(4),
+                    // ),
+                    // const Expanded(
+                    //   child: Image(
+                    //     image: AssetImage("assets/pain.jpeg"),
+                    //     fit: BoxFit.cover,
+                    //   ),
+                    // ),
                   ],
                 ),
-              ],
             ),
             Padding(
               padding: const EdgeInsets.all(8),
@@ -77,7 +208,7 @@ class CustomCard extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  discountedPrice,
+                                  "₹$discountedPrice",
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -88,7 +219,7 @@ class CustomCard extends StatelessWidget {
                                   width: 4.0,
                                 ),
                                 Text(
-                                  price,
+                                  "₹$price",
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

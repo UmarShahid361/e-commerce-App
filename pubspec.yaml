@@ -48,6 +48,8 @@ dependencies:
   firebase_auth: ^4.6.3
   fluttertoast: ^8.2.2
   get: ^4.6.5
+  whatsapp: ^0.0.1
+  cached_network_image: ^3.2.3
 
 dev_dependencies:
   flutter_test:
