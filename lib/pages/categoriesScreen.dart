@@ -1,3 +1,4 @@
+import 'package:e_commerce_app/main.dart';
 import 'package:e_commerce_app/pages/cart.dart';
 import 'package:e_commerce_app/pages/profilePages/search.dart';
 import 'package:e_commerce_app/pages/wishList.dart';
@@ -8,6 +9,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+class MainCategoryModel{
+  String mainCategory;
+  String docId;
+  MainCategoryModel({required this.mainCategory, required this.docId});
+}
 class Categories extends StatefulWidget {
   const Categories({Key? key}) : super(key: key);
 
@@ -16,23 +23,31 @@ class Categories extends StatefulWidget {
 }
 
 class _CategoriesState extends State<Categories> {
-  final fireStore =
-      FirebaseFirestore.instance.collection('Single Pieces').snapshots();
+
   String? item;
-  final List<bool> _expandedList = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-  ];
+  List<bool> expandedList = [];
+  bool isLoadingMainCategory = true;
   bool click1 = true;
   bool click2 = true;
   bool click3 = true;
   bool index = true;
+  List<MainCategoryModel> mainCategories = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseFirestore.instance.collection("Single Piece").get().then((value) {
+      for(int i = 0; i< value.docs.length; i++){
+        mainCategories.add(MainCategoryModel(mainCategory: value.docs[i].data()['category'], docId: value.docs[i].id));
+        expandedList.add(false);
+      }
+      isLoadingMainCategory = false;
+      setState(() {
 
+      });
+
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,78 +211,92 @@ class _CategoriesState extends State<Categories> {
                 ],
               ),
             ),
+
             Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width * 0.6,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                 ),
-                child: Center(
-                  child: Builder(builder: (context) {
-                    index;
-                    return index == true
-                        ? ListView(
-                            children: [
-                              _buildExpandableList(0, 'Saree', [
-                                'Daily Wear Saree',
-                                'Printed Saree',
-                                'Cotton Saree',
-                                'Silk Saree',
-                                'All Saree'
-                                // Add more sarees here
-                              ]),
-                              _buildExpandableList(1, 'Gowns', [
-                                'Gown 1',
-                                'Gown 2',
-                                'Gown 3',
-                                // Add more gowns here
-                              ]),
-                              _buildExpandableList(2, 'Westerns', [
-                                'Western 1',
-                                'Western 2',
-                                'Western 3',
-                                // Add more westerns here
-                              ]),
-                              _buildExpandableList(3, 'Dress Material', [
-                                'Dress Material 1',
-                                'Dress Material 2',
-                                'Dress Material 3',
-                                // Add more dress materials here
-                              ]),
-                              _buildExpandableList(4, 'Lehengas', [
-                                'All Lehengas',
-                              ]),
-                              _buildExpandableList(5, 'Kurti', [
-                                'Printed Kurti',
-                                'Designer Kurti',
-                                'All Kurti',
-                                // Add more kurtis here
-                              ]),
-                              _buildExpandableList(6, 'Top with Bottom', [
-                                'Kurti Plazo',
-                                'All Top with Bottom',
-                                // Add more tops with bottoms here
-                              ]),
-                            ],
-                          )
-                        : Lottie.asset('assets/146399-isometric-box.json',
-                            height: 400, width: 400, repeat: false);
-                  }),
-                )),
+              child: isLoadingMainCategory ?  Center(child: CircularProgressIndicator())
+              : ListView(
+                children: [
+                  ExpansionPanelList(
+                    expansionCallback: (panelIndex, isExpanded) {
+                      for(int i = 0; i<expandedList.length; i++){
+                        if(i != panelIndex) {
+                          expandedList[i] = false;
+                        }
+                      }
+                      expandedList[panelIndex] = !expandedList[panelIndex];
+                      setState(() {
+
+                      });
+                    },
+                    children: [
+                      ...mainCategories.asMap().entries.map((e) =>  ExpansionPanel(
+                        canTapOnHeader: true,
+                        headerBuilder: (context, isExpanded) {
+                          return Center(
+                            child: Text(e.value.mainCategory, style:
+                            TextStyle(
+                              fontSize: 15,
+                            ),),
+                          );
+                        },
+                        isExpanded: expandedList[e.key],
+                        body:  Column(
+                          children: [
+                            FutureBuilder(
+                              future:  FirebaseFirestore.instance.collection("Single Piece").doc(e.value.docId).collection("subCategory").get(),
+                              builder: (context, snapshotSubCategory) {
+                                if(snapshotSubCategory.connectionState == ConnectionState.waiting){
+                                  return const Center(child: CircularProgressIndicator(color: Colors.purple,));
+                                }
+                                if(snapshotSubCategory.hasError){
+                                  return Center(child: Text(snapshotSubCategory.error.toString()),);
+                                }
+                                if(snapshotSubCategory.connectionState == ConnectionState.done && snapshotSubCategory.data!.docs.isEmpty){
+                                  return Center(child: Text("No Sub Categories found"),);
+                                }
+
+                                return Column(
+                                  children: [
+                                    ...snapshotSubCategory.data!.docs.asMap().entries.map((e) {
+                                      print(e.value.data()['subCategoryName']);
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                        child: Text(e.value.data()["subCategoryName"], style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),),
+                                      );
+                                    })
+                                  ],
+                                );
+
+                              },
+                            )
+                          ],
+                        ),
+                      ))
+
+                    ],
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget _buildExpandableList(int index, String header, List<String> items) {
+  /*Widget _buildExpandableList(int index, String header, List<String> items) {
     return ExpansionPanelList(
       animationDuration: const Duration(milliseconds: 500),
       elevation: 1,
       expandedHeaderPadding: const EdgeInsets.all(8),
       expansionCallback: (int panelIndex, bool isExpanded) {
         setState(() {
-          _expandedList[index] = !isExpanded;
+          expandedList[index] = !isExpanded;
         });
       },
       children: [
@@ -301,7 +330,7 @@ class _CategoriesState extends State<Categories> {
         ),
       ],
     );
-  }
+  }*/
 
   void _navigateToProductList(String item) {
     Navigator.push(

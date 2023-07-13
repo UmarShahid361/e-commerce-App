@@ -16,6 +16,7 @@ class CustomDisplay extends StatefulWidget {
   final String OFF;
   final List url;
   final String description;
+  final String id;
 
   const CustomDisplay(
       {super.key,
@@ -24,7 +25,7 @@ class CustomDisplay extends StatefulWidget {
       required this.discountedPrice,
       required this.OFF,
       required this.url,
-      required this.description});
+      required this.description, required this.id});
 
 
   @override
@@ -35,6 +36,17 @@ class _CustomDisplayState extends State<CustomDisplay> {
   int activeIndex = 0;
   int _currentIndex = 0;
   final Uri whatsappNumber = Uri.parse('https://wa.me/+923114749583');
+
+  late Future<QuerySnapshot<Map<String, dynamic>>> getImages;
+
+  int selectedVarientIndex = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getImages = FirebaseFirestore.instance.collection("Products").doc(widget.id).collection("variants").get();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,28 +87,48 @@ class _CustomDisplayState extends State<CustomDisplay> {
               ),
               child: Column(
                 children: [
-                  CarouselSlider.builder(
-                    itemCount: widget.url.length,
-                    itemBuilder: (context, index, realIndex) {
-                      final urlImage = widget.url[index];
-                      return buildImage(urlImage, index);
+                  FutureBuilder(
+                    future: getImages,
+                    builder: (context, snapshot) {
+                      if(snapshot.connectionState == ConnectionState.waiting){
+                        return const Center(child: CircularProgressIndicator(color: Colors.purple,));
+                      }
+                      if(snapshot.hasError){
+                        return Center(child: Text(snapshot.error.toString()),);
+                      }
+                      if(snapshot.connectionState == ConnectionState.done && snapshot.data!.docs.isEmpty){
+                        return Center(child: Text("No Sub Categories found"),);
+                      }
+
+                      return Column(
+                        children: [
+                          CarouselSlider.builder(
+                            itemCount: snapshot.data!.docs[selectedVarientIndex].data()['imageURLs'].length,
+                            itemBuilder: (context, index, realIndex) {
+                              final urlImage = snapshot.data!.docs[selectedVarientIndex].data()['imageURLs'][index];
+                              return buildImage(urlImage, index);
+                            },
+                            options: CarouselOptions(
+                              height: 200,
+                              onPageChanged: (index, reason) {
+                                setState(() {
+                                  activeIndex = index;
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          buildIndicator(activeIndex, snapshot.data!.docs[selectedVarientIndex].data()['imageURLs']),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ) ;
                     },
-                    options: CarouselOptions(
-                      height: 200,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          activeIndex = index;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  buildIndicator(activeIndex, widget.url),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  )
+
                 ],
               ),
             ),
@@ -127,10 +159,18 @@ class _CustomDisplayState extends State<CustomDisplay> {
                           itemBuilder: (BuildContext context, int index) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                radius: 40,
-                                foregroundImage: CachedNetworkImageProvider(
-                                  widget.url[index],
+                              child: GestureDetector(
+                                onTap: () {
+                                  selectedVarientIndex = index;
+                                  setState(() {
+
+                                  });
+                                },
+                                child: CircleAvatar(
+                                  radius: 40,
+                                  foregroundImage: CachedNetworkImageProvider(
+                                    widget.url[index],
+                                  ),
                                 ),
                               ),
                             );
@@ -267,7 +307,7 @@ class _CustomDisplayState extends State<CustomDisplay> {
             Container(
               padding: const EdgeInsets.all(8.0),
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.7,
+              // height: MediaQuery.of(context).size.height * 0.7,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -282,26 +322,14 @@ class _CustomDisplayState extends State<CustomDisplay> {
                   const SizedBox(
                     height: 20,
                   ),
-                  FutureBuilder(
-                      future: FirebaseFirestore.instance
-                          .collection("Products")
-                          .get(),
-                      builder:
-                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return const Text("Something went wrong");
-                        }
-                        return Expanded(
-                          child: Text(
-                            snapshot.data!.docs[0]["description"],
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        );
-                      }),
+                  Text(
+                   widget.description,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
               ),
             ),

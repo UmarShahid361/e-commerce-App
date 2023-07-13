@@ -26,7 +26,7 @@ class CustomCard extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => CustomDisplay(title: title, price: price, discountedPrice: discountedPrice, OFF: OFF, url: url, description: description,)));
+                  builder: (context) => CustomDisplay(id: id, title: title, price: price, discountedPrice: discountedPrice, OFF: OFF, url: url, description: description,)));
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
